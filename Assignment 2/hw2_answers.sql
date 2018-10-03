@@ -10,6 +10,9 @@
 --     The tables also have CONSTRAINTs - that do they tell you?
 --     
 
+-- This database is in Normal Form. It is 3NF since there is a non-key value that depend on primary key. 
+-- Each table consists of a unique single value and there are no transitive functional dependency on attributes.
+
 -- Part II: Queries
 
 -- Warm-ups: Some SQL practice:
@@ -130,17 +133,38 @@ DESC LIMIT 10;
 -- 9. Which of the cities from Question #7 are capitals of their country?
 --     (requires a join and a subquery).
 
+SELECT 
+	t1.name as city,
+	t1.population,
+	t2.name as country,
+	t2.continent
+FROM city t1
+	INNER JOIN country t2
+		ON t1.id = t2.capital
+WHERE t1.id IN (
+		SELECT id FROM city 
+			INNER JOIN country
+				ON city.countrycode = country.code
+		ORDER BY city.population
+		DESC LIMIT 10)
+ORDER BY t1.population DESC;
+
 -- 10. For the cities found in Question #7, what percentage of the country’s population lives in the capital city?
 --     (watch your int’s vs floats !).
 
-
-
-
-
-
-
-
-
-
-
-
+SELECT
+	t1.name AS city,
+	t2.name AS country,
+	t1.population::FLOAT/t2.population::FLOAT*100 as per_capital_pop
+FROM city t1
+	INNER JOIN country t2
+		ON t1.id = t2.capital
+WHERE id IN (
+	SELECT 
+		t2.capital
+	FROM city t1
+		INNER JOIN country t2
+			ON t1.countrycode = t2.code
+	ORDER BY t1.population
+	DESC LIMIT 10)
+ORDER BY per_capital_pop DESC;
