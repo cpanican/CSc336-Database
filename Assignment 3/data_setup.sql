@@ -9,28 +9,28 @@ DROP TABLE IF EXISTS transactions CASCADE;
 SET client_encoding = 'LATIN1';
 
 CREATE TABLE boats (
-    prod_id,
-    brand,
-    category,
-    cost,
-    price
+    prod_id integer NOT NULL,
+    brand text NOT NULL,
+    category text,
+    cost integer NOT NULL,
+    price numeric(10,1) NOT NULL
 );
 
 CREATE TABLE buyers (
-    cust_id,
-    fname,
-    lname,
-    city,
-    state,
-    referrer
+    cust_id integer NOT NULL,
+    fname text NOT NULL,
+    lname text NOT NULL,
+    city text NOT NULL,
+    state character(2) NOT NULL,
+    referrer text
 );
 
 CREATE TABLE transactions (
-    trans_id,
-    cust_id,
-    prod_id,
-    qty,
-    price
+    trans_id integer NOT NULL,
+    cust_id integer NOT NULL,
+    prod_id integer NOT NULL,
+    qty integer NOT NULL,
+    price numeric(10,1) NOT NULL
 );
 
 \COPY boats FROM './boats.csv' WITH (FORMAT csv);
@@ -40,20 +40,20 @@ CREATE TABLE transactions (
 \COPY transactions FROM './transactions.csv' WITH (FORMAT csv);
 
 
--- ALTER TABLE ONLY city
---     ADD CONSTRAINT city_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY boats
+    ADD CONSTRAINT boats_pkey PRIMARY KEY (prod_id);
 
--- ALTER TABLE ONLY country
---     ADD CONSTRAINT country_pkey PRIMARY KEY (code);
+ALTER TABLE ONLY buyers
+    ADD CONSTRAINT buyers_pkey PRIMARY KEY (cust_id);
 
--- ALTER TABLE ONLY countrylanguage
---     ADD CONSTRAINT countrylanguage_pkey PRIMARY KEY (countrycode, "language");
+ALTER TABLE ONLY transactions
+    ADD CONSTRAINT transactions_pkey PRIMARY KEY (trans_id);
 
--- ALTER TABLE ONLY country
---     ADD CONSTRAINT country_capital_fkey FOREIGN KEY (capital) REFERENCES city(id);
+ALTER TABLE ONLY transactions
+    ADD CONSTRAINT transactions_fkey1 FOREIGN KEY (cust_id) REFERENCES buyers(cust_id);
 
--- ALTER TABLE ONLY countrylanguage
---     ADD CONSTRAINT countrylanguage_countrycode_fkey FOREIGN KEY (countrycode) REFERENCES country(code);
+ALTER TABLE ONLY transactions
+    ADD CONSTRAINT transactions_fkey2 FOREIGN KEY (prod_id) REFERENCES boats(prod_id);
 
 COMMIT;
 
