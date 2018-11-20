@@ -51,6 +51,34 @@ CREATE TEMP TABLE best_year_returns AS (
     FROM year_end_prices
 );
 
-SELECT * FROM best_year_returns
+SELECT *
+FROM best_year_returns
 WHERE annual_returns IS NOT NULL
 ORDER BY annual_returns DESC;
+
+-- Queries to answer #3
+
+DROP TABLE IF EXISTS awesome_performers CASCADE;
+
+CREATE TABLE awesome_performers AS
+    WITH top_100_companies AS (
+        SELECT
+            *,
+            ROW_NUMBER() OVER (
+                ORDER BY annual_returns DESC
+            ) AS row
+        FROM best_year_returns
+        WHERE annual_returns IS NOT NULL
+        ORDER BY annual_returns DESC
+        LIMIT 100
+    )
+    SELECT
+        symbol,
+        "year",
+        start_price,
+        end_price,
+        annual_returns
+    FROM top_100_companies
+    WHERE "row" % 2 = 0;
+
+SELECT * FROM awesome_performers;
