@@ -104,6 +104,7 @@ CREATE TEMP TABLE price_to_earning AS
 -- SELECT * FROM price_to_earning WHERE price_to_earning_ratio > 0 ORDER BY price_to_earning_ratio DESC LIMIT 10;
 
 
+
 -- Amount of liquid cash in the bank vs. total liabilities?
 CREATE TEMP TABLE liquid_vs_liabilities AS
     SELECT
@@ -118,10 +119,69 @@ CREATE TEMP TABLE liquid_vs_liabilities AS
 
 -- Part 2
 
+-- These factors had a huge contribution to high performance of all companies:
+--     1. net_income_yearly
+--     2. revenue_growth_yearly
+--     3. eps_growth_yearly
+
+CREATE TEMP TABLE potential_candidates AS
+    SELECT
+        symbol,
+        year,
+        (net_income/LEAD((net_income)::NUMERIC) OVER (
+            PARTITION BY symbol ORDER BY year DESC
+        ))::NUMERIC(10,2) - 1 AS net_inc_growth,
+        (total_revenue/LEAD((total_revenue)::NUMERIC) OVER (
+            PARTITION BY symbol ORDER BY year DESC
+        ))::NUMERIC(10,2) - 1 AS revenue_growth,
+        (earnings_per_share/LEAD((earnings_per_share)::NUMERIC) OVER (
+            PARTITION BY symbol ORDER BY year DESC
+        ))::NUMERIC(10,2) - 1 AS eps_growth
+    FROM fundamentals
+    ORDER BY symbol;
+
+SELECT
+    t1.symbol,
+    t2.company,
+    t2.sector,
+    t1.year,
+    t1.net_inc_growth,
+    t1.revenue_growth,
+    t1.eps_growth
+FROM potential_candidates t1
+INNER JOIN securities t2
+    ON t1.symbol = t2.symbol
+WHERE 
+    year='2016' AND
+    (net_inc_growth > 0.02) AND
+    (revenue_growth BETWEEN 0 AND 0.5) AND
+    (eps_growth > 0.15);
+
 
 
 -- Part 3
+-- From this list, select 10 companies to invest in.
+-- No more then 2 companies in the same sector
 
+-- Information Technology
+-- 1. CSCO | Cisco Systems
+-- 2. INTU | Intuit Inc.
+
+-- Health Care
+-- 3. CAH  | Cardinal Health Inc.
+-- 4. HOLX | Hologic
+
+-- Industrials
+-- 5. AYI  | Acuity Brands Inc
+-- 6. FDX  | FedEx Corporation
+
+-- Consumer Staples
+-- 7. SJM  | JM Smucker
+-- 8. SYY  | Sysco Corp.
+
+-- Consumer Discretionary
+-- 9. DHI  | D. R. Horton
+-- 10. DIS | The Walt Disney Company
 
 
 
