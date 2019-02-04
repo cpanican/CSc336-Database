@@ -5,4 +5,5 @@ Homework files and other useful resources that were used in my CCNY CSC336 - Int
 ## Notes
 
 - We used [PostgreSQL](https://www.postgresql.org/) in this class.
-- Assignment 7 and 8 were extra credit.
+- Assignment 8 was extra credit.
+- The code may not be implemented correctly.
